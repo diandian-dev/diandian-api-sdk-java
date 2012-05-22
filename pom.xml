@@ -7,6 +7,10 @@
 	<packaging>pom</packaging>
     	<modules>
 		<module>diandian-api-sdk-common</module>
-		<module>diandian-api-sdk-java</module>
+<!--		<module>diandian-api-sdk-android</module>
+		<module>diandian-api-sdk-android-sample</module>
+-->    
+	<module>diandian-api-sdk-java</module>
+    <module>diandian-api-sdk-java-sample</module>
   </modules>
 </project>

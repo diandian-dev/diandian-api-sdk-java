@@ -29,8 +29,9 @@ public class TagService {
      * @param tag
      * @return
      */
-    public DashboardView getTagPost(String tag) {
-        return this.ddClientInvoker.getTagPost(tag);
+    public DashboardView getTagPost(String tag, String sinceId, int limit, Boolean reblogInfo,
+            Boolean notesInfo) {
+        return this.ddClientInvoker.getTagPost(tag, limit, sinceId, reblogInfo, notesInfo);
     }
 
     /**

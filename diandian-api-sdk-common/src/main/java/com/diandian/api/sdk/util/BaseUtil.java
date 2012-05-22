@@ -121,7 +121,7 @@ public class BaseUtil {
      */
     public static String read(InputStream in) throws IOException {
         StringBuilder sb = new StringBuilder();
-        BufferedReader r = new BufferedReader(new InputStreamReader(in), 1000);
+        BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"), 1000);
         for (String line = r.readLine(); line != null; line = r.readLine()) {
             sb.append(line);
         }

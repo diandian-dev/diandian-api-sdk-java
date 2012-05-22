@@ -73,7 +73,8 @@ public class DDClient {
      * @return
      */
     public String getOauthUrl() {
-        return URL_AUTHORIZE + "client_id=" + appKey + "&response_type=code";
+        return URL_AUTHORIZE + "?client_id=" + appKey + "&response_type=code&scope="
+                + StringUtils.join(DEFAULT_PERMISSIONS, ",");
     }
 
     /**
@@ -127,7 +128,7 @@ public class DDClient {
         param.add("client_secret", this.getAppSecret());
         param.add("grant_type", "refresh_token");
         param.add("refresh_token", token.getRefreshToken());
-        param.add("scope", StringUtils.join(",", DEFAULT_PERMISSIONS));
+        param.add("scope", StringUtils.join(DEFAULT_PERMISSIONS, ","));
         this.initAccessToken(param);
 
     }
@@ -135,10 +136,8 @@ public class DDClient {
     private synchronized void initAccessToken(DDParameters param) {
         try {
             String url = URL_OAUTH_TOKEN + "?" + DDHttpTools.encodeUrl(param.mParameters);
-            //String result = this.getByHttps(url, null, null);
             String result = this.doGet(url, null, null);
-            JSONObject json;
-            json = new JSONObject(result);
+            JSONObject json = new JSONObject(result);
             if (token == null) {
                 token = new Token();
             }

@@ -30,7 +30,7 @@ public class TagServiceTest extends TestCase {
     }
 
     public void testTagPost() {
-        DashboardView dbv = this.tagService.getTagPost(tag);
+        DashboardView dbv = this.tagService.getTagPost(tag, null, 5, false, false);
         assertTrue(dbv != null && dbv.getPosts().get(0).getTags().contains(tag));
     }
 

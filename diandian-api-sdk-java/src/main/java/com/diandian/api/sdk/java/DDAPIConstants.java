@@ -13,15 +13,15 @@ package com.diandian.api.sdk.java;
  */
 public class DDAPIConstants {
 
-    public static final String APP_KEY = "";
+    public static final String APP_KEY = "appKey";
 
-    public static final String APP_SECRET = "";
+    public static final String APP_SECRET = "appSercret";
 
-    public static final String USER_NAME = "";
+    public static final String USER_NAME = "userName";
 
-    public static final String USER_PASSWORD = "";
+    public static final String USER_PASSWORD = "password";
 
-    public static final String REDIRECT_URI = "";
+    public static final String REDIRECT_URI = "http://127.0.0.1";
 
     public static final int MAX_ITEM_PERPAGE = 50;
 

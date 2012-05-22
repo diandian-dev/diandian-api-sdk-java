@@ -4,6 +4,7 @@
 package com.diandian.api.sdk.java;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 
 import com.diandian.api.sdk.DDJSONParser;
 import com.diandian.api.sdk.exception.DDAPIException;
+import com.diandian.api.sdk.model.ImageInfo;
 import com.diandian.api.sdk.model.LinkPostInfo;
 import com.diandian.api.sdk.model.PhotoPostInfo;
 import com.diandian.api.sdk.model.PostBaseInfo;
@@ -106,7 +108,10 @@ public class DDJSON2BeanFactory {
                 } else if ("text".equalsIgnoreCase(type)) {
                     p = parser.fromJson2Bean(j.toString(), TextPostInfo.class);
                 } else if ("photo".equalsIgnoreCase(type)) {
-                    p = parser.fromJson2Bean(j.toString(), PhotoPostInfo.class);
+                    PhotoPostInfo photo = parser.fromJson2Bean(j.toString(), PhotoPostInfo.class);
+                    String photos = j.get("photos").toString();
+                    photo.setPhotos(fillPhotos(photos, parser));
+                    p = photo;
                 } else if ("audio".equalsIgnoreCase(type)) {
                     String audioType = (String) j.get("audioType");
                     if ("userAudio".equalsIgnoreCase(audioType)) {
@@ -123,5 +128,20 @@ public class DDJSON2BeanFactory {
             throw new DDAPIException(400, e.getMessage(), e);
         }
         return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ImageInfo[] fillPhotos(String photos, DDJSONParser parser) throws JSONException {
+        JSONArray json = new JSONArray(photos);
+        int length = json.length();
+        ImageInfo[] imageInfo = new ImageInfo[length];
+        for (int i = 0; i < length; i++) {
+            JSONObject j = (JSONObject) json.get(i);
+            ImageInfo image = parser.fromJson2Bean(j.toString(), ImageInfo.class);
+            String images = j.getString("altSizes");
+            image.setAltSize(parser.fromJson2Bean(images.toString(), HashMap.class));
+            imageInfo[i] = image;
+        }
+        return imageInfo;
     }
 }

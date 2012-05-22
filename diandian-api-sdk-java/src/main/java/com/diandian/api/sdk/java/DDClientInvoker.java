@@ -4,6 +4,8 @@
 package com.diandian.api.sdk.java;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -754,17 +756,36 @@ public class DDClientInvoker {
         }
     }
 
+    private DDParameters getParamForTagPost(String tag, int limit, String sinceId,
+            Boolean reblogInfo, Boolean notesInfo) {
+        checkTag(tag);
+
+        DDParameters param = new DDParameters();
+        param.add("limit", limit + "");
+        if (StringUtils.isNotEmpty(sinceId)) {
+            param.add("sinceId", sinceId);
+        }
+        param.add("reblogInfo", reblogInfo + "");
+        param.add("notesInfo", notesInfo + "");
+        return param;
+    }
+
     /**
      * 获取标有某tag的posts
      * 
      * @param tag
      * @return
      */
-    public DashboardView getTagPost(String tag) {
-        checkTag(tag);
-        return this.getInfo(String.format(GET_TAG_POSTS_FORMAT, tag), null, DashboardView.class,
-                this.ddClient.getToken());
-
+    public DashboardView getTagPost(String tag, int limit, String sinceId, Boolean reblogInfo,
+            Boolean notesInfo) {
+        try {
+            return this.getInfo(
+                    String.format(GET_TAG_POSTS_FORMAT, URLEncoder.encode(tag, "UTF-8")),
+                    getParamForTagPost(tag, limit, sinceId, reblogInfo, notesInfo),
+                    DashboardView.class, this.ddClient.getToken());
+        } catch (UnsupportedEncodingException e) {
+            throw new DDAPIException(400, e.getMessage(), null);
+        }
     }
 
     /**
@@ -774,7 +795,12 @@ public class DDClientInvoker {
      */
     public void watchTag(String tag) {
         checkTag(tag);
-        this.doPost(String.format(POST_WATCH_FORMAT, tag), null, ddClient.getToken());
+        try {
+            this.doPost(String.format(POST_WATCH_FORMAT, URLEncoder.encode(tag, "UTF-8")), null,
+                    ddClient.getToken());
+        } catch (UnsupportedEncodingException e) {
+            throw new DDAPIException(400, e.getMessage(), null);
+        }
 
     }
 
@@ -785,7 +811,12 @@ public class DDClientInvoker {
      */
     public void unwatchTag(String tag) {
         checkTag(tag);
-        this.doPost(String.format(DELETE_WATCH_FORMAT, tag), null, ddClient.getToken());
+        try {
+            this.doPost(String.format(DELETE_WATCH_FORMAT, URLEncoder.encode(tag, "UTF-8")), null,
+                    ddClient.getToken());
+        } catch (UnsupportedEncodingException e) {
+            throw new DDAPIException(400, e.getMessage(), null);
+        }
 
     }
 
