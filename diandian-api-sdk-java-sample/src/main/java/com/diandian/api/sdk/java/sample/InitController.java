@@ -27,9 +27,9 @@ public class InitController {
     DDClient ddClient;
 
     {
-        ddClient = new DDClient("appKey", "appSecret",
-                "http://127.0.0.1");
-        ddClient.setDdHttpTools(new HttpsTools());
+        ddClient = new DDClient(DDAPIConstants.APP_KEY, DDAPIConstants.APP_SECRET,
+                DDAPIConstants.REDIRECT_URI);
+	ddClient.setDdHttpTools(new HttpsTools());
     }
 
     @RequestMapping("oauthcode")

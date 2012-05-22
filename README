@@ -1,1 +1,8 @@
 点点网开放平台java sdk雏形
+
+注意事项:
+1，正常的mvn clean package 会运行单元测试。如果不想执行运行的话，请运行：mvn -U clean package -Dmaven.test.skip=true去掉单元测试。
+2，运行时需要填写你的appKey,appSecret和redirectUri。在APPConstants中
+3，如果要运行单元测试，你的账号和密码需要申请password认证方式。
+
+

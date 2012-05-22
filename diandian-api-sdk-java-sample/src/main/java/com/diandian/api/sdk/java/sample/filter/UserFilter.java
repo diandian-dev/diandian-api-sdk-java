@@ -49,8 +49,8 @@ public class UserFilter implements Filter {
         if (this.needLogin((HttpServletRequest) request)) {
             if (RequestThreadUtils.getDDClientInvoker() == null) {
 
-                DDClient ddClient = new DDClient("appKey",
-                        "appSecret", "http://127.0.0.1");
+                DDClient ddClient = new DDClient(DDAPIConstants.APP_KEY, DDAPIConstants.APP_SECRET,
+                DDAPIConstants.REDIRECT_URI);
                 ddClient.setDdHttpTools(new HttpsTools());
                 Token token = Util.string2Token(getCookie("access_token",
                         (HttpServletRequest) request));
