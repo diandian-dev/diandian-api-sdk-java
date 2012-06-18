@@ -26,8 +26,8 @@ import com.diandian.api.sdk.view.TagView;
 
 /**
  * @author zhangdong zhangdong@diandian.com
+ * @author Lookis (lucas@diandian.com)
  * 
- *         2012-5-8 下午6:03:03
  */
 public class DDClientInvoker {
 
@@ -37,8 +37,7 @@ public class DDClientInvoker {
 
     private final DDJSON2BeanFactory json2BeanFactory;
 
-    private static DDClientInvoker instance;
-
+    //    private static DDClientInvoker instance;
     private static final String GET_HOME_URL = DDAPIConstants.HOST + "v1/user/home";
 
     private static final String GET_FOLLOWERS_FORMAT = DDAPIConstants.HOST + "v1/blog/%s/followers";
@@ -86,32 +85,32 @@ public class DDClientInvoker {
 
     private static final String GET_MYTAGS_URL = DDAPIConstants.HOST + "v1/tag/mytags";
 
+    //    /**
+    //     * 初始化。需要DDClient和parser。二者皆不能为空
+    //     * 
+    //     * @param ddClient
+    //     * @param parser
+    //     * @return
+    //     */
+    //    public synchronized static DDClientInvoker init(DDClient ddClient, DDJSONParser parser) {
+    //        instance = new DDClientInvoker(ddClient, parser);
+    //        return instance;
+    //    }
+    //
+    //    public synchronized static DDClientInvoker getInstance() {
+    //        if (instance == null) {
+    //            throw new DDAPIException(DDAPIConstants.DDCLIENT_INVOKER_NOT_INIT, "invoker not init",
+    //                    null);
+    //        }
+    //        return instance;
+    //    }
     /**
-     * 初始化。需要DDClient和parser。二者皆不能为空
+     * 非单例模式,由于java版本的sdk可以用在服务端,可能有时需要同时Invoke不同的用户
      * 
      * @param ddClient
      * @param parser
-     * @return
      */
-    public synchronized static DDClientInvoker init(DDClient ddClient, DDJSONParser parser) {
-        instance = new DDClientInvoker(ddClient, parser);
-        return instance;
-    }
-
-    public synchronized static DDClientInvoker getInstance() {
-        if (instance == null) {
-            throw new DDAPIException(DDAPIConstants.DDCLIENT_INVOKER_NOT_INIT, "invoker not init",
-                    null);
-        }
-        return instance;
-    }
-
-    /**
-     * 
-     * @param ddClient
-     * @param parser
-     */
-    private DDClientInvoker(DDClient ddClient, DDJSONParser parser) {
+    public DDClientInvoker(DDClient ddClient, DDJSONParser parser) {
         this.ddClient = ddClient;
         this.parser = parser;
         this.json2BeanFactory = new DDJSON2BeanFactory();
@@ -134,7 +133,6 @@ public class DDClientInvoker {
         param.add("limit", Math.min(limit, DDAPIConstants.MAX_ITEM_PERPAGE) + "");
         param.add("offset", Math.max(0, offset) + "");
         return param;
-
     }
 
     /**
@@ -178,8 +176,7 @@ public class DDClientInvoker {
     }
 
     /**
-     * 获取post。
-     * 注：postId不为空，则取一post
+     * 获取post。 注：postId不为空，则取一post
      * 
      * @param blogCName
      * @param type
@@ -262,7 +259,7 @@ public class DDClientInvoker {
             param.add("title", title);
         }
         if (!StringUtils.isEmpty(body)) {
-            param.add("bode", body);
+            param.add("body", body);
         }
         return param;
     }
@@ -277,13 +274,12 @@ public class DDClientInvoker {
      * @param title
      * @param body
      */
-    public void postText(String blogCName, String state, String tag, String slug, String title,
+    public String postText(String blogCName, String state, String tag, String slug, String title,
             String body) {
         String url = String.format(POST_POST_FORMAT, blogCName);
-        this.doPost(url,
+        return this.doPost(url,
                 getTextParamForPost(DDAPIConstants.POST_TEXT, state, tag, slug, title, body),
                 ddClient.getToken());
-
     }
 
     private DDParameters getLinkParamForPost(String type, String state, String tag, String slug,
@@ -313,12 +309,11 @@ public class DDClientInvoker {
      * @param url
      * @param description
      */
-    public void postLink(String blogCName, String state, String tag, String slug, String title,
+    public String postLink(String blogCName, String state, String tag, String slug, String title,
             String url, String description) {
         String postUrl = String.format(POST_POST_FORMAT, blogCName);
-        this.doPost(postUrl, this.getLinkParamForPost(DDAPIConstants.POST_LINK, state, tag, slug,
-                title, postUrl, description), ddClient.getToken());
-
+        return this.doPost(postUrl, this.getLinkParamForPost(DDAPIConstants.POST_LINK, state, tag,
+                slug, title, postUrl, description), ddClient.getToken());
     }
 
     private DDParameters getVideoParamForPost(String type, String state, String tag, String slug,
@@ -333,7 +328,6 @@ public class DDClientInvoker {
             param.add("caption", caption);
         }
         return param;
-
     }
 
     /**
@@ -346,12 +340,11 @@ public class DDClientInvoker {
      * @param caption
      * @param sourceUrl
      */
-    public void postVideo(String blogCName, String state, String tag, String slug, String caption,
-            String sourceUrl) {
+    public String postVideo(String blogCName, String state, String tag, String slug,
+            String caption, String sourceUrl) {
         String url = String.format(POST_POST_FORMAT, blogCName);
-        this.doPost(url, this.getVideoParamForPost(DDAPIConstants.POST_VIDEO, state, tag, slug,
-                caption, sourceUrl), ddClient.getToken());
-
+        return this.doPost(url, this.getVideoParamForPost(DDAPIConstants.POST_VIDEO, state, tag,
+                slug, caption, sourceUrl), ddClient.getToken());
     }
 
     private DDParameters getAudioParamForPost(String type, String state, String tag, String slug,
@@ -382,12 +375,13 @@ public class DDClientInvoker {
      * @param musicName
      * @param musicSinger
      */
-    public void postAudio(String blogCName, String state, String tag, String slug, String caption,
-            String filePath, String musicName, String musicSinger) {
+    public String postAudio(String blogCName, String state, String tag, String slug,
+            String caption, String filePath, String musicName, String musicSinger) {
         byte[] data = BaseUtil.getFileData(new File(filePath));
         String url = String.format(POST_POST_FORMAT, blogCName);
-        ddClient.doUpload(url, this.getAudioParamForPost(DDAPIConstants.POST_AUDIO, state, tag,
-                slug, caption, musicName, musicSinger), "data", filePath, data, ddClient.getToken());
+        return parseResponse(ddClient.doUpload(url, this.getAudioParamForPost(
+                DDAPIConstants.POST_AUDIO, state, tag, slug, caption, musicName, musicSinger),
+                "data", filePath, data, ddClient.getToken()));
     }
 
     private DDParameters getPhotoParamForPost(String type, String state, String tag, String slug,
@@ -409,14 +403,13 @@ public class DDClientInvoker {
      * @param caption
      * @param filePath
      */
-    public void postPhoto(String blogCName, String state, String tag, String slug, String caption,
-            String filePath) {
+    public String postPhoto(String blogCName, String state, String tag, String slug,
+            String caption, String filePath) {
         byte[] data = BaseUtil.getFileData(new File(filePath));
         String url = String.format(POST_POST_FORMAT, blogCName);
-        ddClient.doUpload(url,
+        return parseResponse(ddClient.doUpload(url,
                 this.getPhotoParamForPost(DDAPIConstants.POST_PHOTO, state, tag, slug, caption),
-                "data", filePath, data, ddClient.getToken());
-
+                "data", filePath, data, ddClient.getToken()));
     }
 
     /**
@@ -431,35 +424,39 @@ public class DDClientInvoker {
     public <T> T getInfo(String url, DDParameters params, Class<T> classType, Token token) {
         String result = ddClient.doGet(url, token, params);
         return json2BeanFactory.fromJson2Bean(result, classType, parser);
-
     }
 
     /**
-     * 发布信息。
-     * 异常：DDAPIException
+     * 发布信息。 异常：DDAPIException
      * 
      * @param url
      * @param params
      * @param token
      */
-    public void doPost(String url, DDParameters params, Token token) {
+    public String doPost(String url, DDParameters params, Token token) {
         String result = ddClient.doPost(url, token, params);
+        return parseResponse(result);
+    }
+
+    private String parseResponse(String jsonResult) {
         try {
-            JSONObject meta = new JSONObject(result).getJSONObject("meta");
+            JSONObject jsonR = new JSONObject(jsonResult);
+            JSONObject meta = jsonR.getJSONObject("meta");
             int code = meta.getInt("status");
             if (code != DDAPIConstants.RESULT_OK) {
                 throw new DDAPIException(code, meta.getString("msg"), null);
+            } else {
+                String response = jsonR.getString("response");
+                return response;
             }
         } catch (JSONException e) {
             throw new DDAPIException(DDAPIConstants.DEFAULT_ERR_CODE, e.getMessage(), e);
         }
-
     }
 
     private DDParameters getEditParam(String type, String state, String tag, String slug,
             String title, String body, String url, String description, String caption,
             String musicName, String musicSinger, String sourceUrl, String id) {
-
         DDParameters param = null;
         if (DDAPIConstants.POST_AUDIO.equalsIgnoreCase(type)) {
             param = this.getAudioParamForPost(type, state, tag, slug, caption, musicName,
@@ -473,7 +470,6 @@ public class DDClientInvoker {
         } else if (DDAPIConstants.POST_VIDEO.equalsIgnoreCase(type)) {
             param = this.getVideoParamForPost(type, state, tag, slug, caption, sourceUrl);
         }
-
         if (param == null) {
             throw new DDAPIException(DDAPIConstants.INVALID_PARAMATERS, "invalid type type" + type,
                     null);
@@ -521,7 +517,6 @@ public class DDClientInvoker {
         this.doPost(String.format(EDIT_POST_FORMAT, blogCName), this.getEditParam(
                 DDAPIConstants.POST_LINK, state, tag, slug, title, null, url, description, null,
                 null, null, null, id), ddClient.getToken());
-
     }
 
     /**
@@ -561,7 +556,6 @@ public class DDClientInvoker {
         ddClient.doUpload(String.format(EDIT_POST_FORMAT, blogCName), this.getEditParam(
                 DDAPIConstants.POST_AUDIO, state, tag, slug, null, null, null, null, caption,
                 musicName, musicSinger, null, id), "data", filePath, data, ddClient.getToken());
-
     }
 
     /**
@@ -619,7 +613,6 @@ public class DDClientInvoker {
         }
         param.add("id", id);
         return param;
-
     }
 
     /**
@@ -759,7 +752,6 @@ public class DDClientInvoker {
     private DDParameters getParamForTagPost(String tag, int limit, String sinceId,
             Boolean reblogInfo, Boolean notesInfo) {
         checkTag(tag);
-
         DDParameters param = new DDParameters();
         param.add("limit", limit + "");
         if (StringUtils.isNotEmpty(sinceId)) {
@@ -801,7 +793,6 @@ public class DDClientInvoker {
         } catch (UnsupportedEncodingException e) {
             throw new DDAPIException(400, e.getMessage(), null);
         }
-
     }
 
     /**
@@ -817,7 +808,6 @@ public class DDClientInvoker {
         } catch (UnsupportedEncodingException e) {
             throw new DDAPIException(400, e.getMessage(), null);
         }
-
     }
 
     /**
@@ -828,5 +818,4 @@ public class DDClientInvoker {
     public TagView getMyTags() {
         return this.getInfo(GET_MYTAGS_URL, null, TagView.class, ddClient.getToken());
     }
-
 }

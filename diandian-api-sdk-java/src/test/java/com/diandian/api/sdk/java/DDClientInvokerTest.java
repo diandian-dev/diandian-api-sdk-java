@@ -16,27 +16,19 @@ import com.diandian.api.sdk.view.TagView;
 public class DDClientInvokerTest extends TestCase {
 
     public DDClientInvokerTest() {
-
     }
 
     public DDClientInvokerTest(String testName) {
         super(testName);
-
     }
 
     public void testGet() {
-
-        DDClientInvoker.init(getClient(), new DefaultJsonParser());
-        TagView tagView = DDClientInvoker.getInstance().getMyTags();
-
+        TagView tagView = new DDClientInvoker(getClient(), new DefaultJsonParser()).getMyTags();
         System.out.println(tagView.toString());
-
     }
 
     public void testPost() {
-        DDClientInvoker.init(getClient(), new DefaultJsonParser());
-        DDClientInvoker.getInstance().watchTag("点点");
-
+        new DDClientInvoker(getClient(), new DefaultJsonParser()).watchTag("点点");
     }
 
     public static DDClient getClient() {
@@ -48,13 +40,11 @@ public class DDClientInvokerTest extends TestCase {
     }
 
     public static void main(String[] args) {
-
         new DDClientInvokerTest().testPost();
         new DDClientInvokerTest().testGet();
-
     }
 
     public static DDClientInvoker getDDClientInvoker() {
-        return DDClientInvoker.init(getClient(), new DefaultJsonParser());
+        return new DDClientInvoker(getClient(), new DefaultJsonParser());
     }
 }
